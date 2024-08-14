@@ -183,6 +183,22 @@ and trans_exp ast nest env =
   | CallFunc ("%", [ left; right ]) ->
       trans_exp left nest env ^ trans_exp right nest env ^ "\tpopq %rbx\n"
       ^ "\tpopq %rax\n" ^ "\tcqto\n" ^ "\tidivq %rbx\n" ^ "\tpushq %rdx\n"
+  | CallFunc ("^", [ base; exp ]) ->
+      let loop_label = sprintf "L%d" (incLabel ()) in
+      let end_label = sprintf "L%d" (incLabel ()) in
+      let code_base = trans_exp base nest env in
+      let code_exp = trans_exp exp nest env in
+      code_exp ^ "\tpopq %rcx\n"  (* exponent in rcx *)
+      ^ code_base ^ "\tpopq %rax\n"  (* base in rax *)
+      ^ "\tmovq $1, %rbx\n"  (* result in rbx *)
+      ^ sprintf "%s:\n" loop_label
+      ^ "\ttestq %rcx, %rcx\n"  (* check if exponent is zero *)
+      ^ sprintf "\tjz %s\n" end_label
+      ^ "\timulq %rax, %rbx\n"  (* multiply result by base *)
+      ^ "\tdecq %rcx\n"  (* decrement exponent *)
+      ^ sprintf "\tjmp %s\n" loop_label
+      ^ sprintf "%s:\n" end_label
+      ^ "\tpushq %rbx\n"  (* push the result onto the stack *)
   | CallFunc ("!", arg :: _) ->
       trans_exp arg nest env ^ "\tnegq (%rsp)\n" (* 関数呼出しのコード *)
   | CallFunc (s, el) ->
