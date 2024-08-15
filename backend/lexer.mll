@@ -26,6 +26,7 @@ rule lexer = parse
   | '<' { LT } 
   | ">=" { GE } 
   | "<=" { LE } 
+  | "++" { PLUSPLUS }
   | '+' { PLUS } 
   | '-' { MINUS } 
   | '*' { TIMES } 
