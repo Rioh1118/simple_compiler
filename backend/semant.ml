@@ -114,6 +114,10 @@ and type_stmt ast env =
       match entry with
       | VarEntry { ty; _ } -> check_array (actual_ty ty)
       | _ -> raise (No_such_symbol s))
+  | CallProc ("++", [VarExp v]) ->
+      let var_type = type_var v env in
+      check_int var_type;
+      ()
   | CallProc (s, el) ->
       let _ = type_exp (CallFunc (s, el)) env in
       ()
@@ -141,6 +145,10 @@ and type_exp ast env =
   match ast with
   | VarExp s -> type_var s env
   | IntExp i -> INT
+  | CallFunc ("post_inc", [VarExp v]) ->
+      let var_type = type_var v env in
+      check_int var_type;
+      INT
   | CallFunc ("+", [ left; right ]) ->
       check_int (type_exp left env);
       check_int (type_exp right env);
