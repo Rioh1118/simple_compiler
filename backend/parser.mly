@@ -7,7 +7,7 @@
 %token <int> NUM
 %token <string> STR
 %token <string> ID
-%token INT IF WHILE SPRINT IPRINT SCAN EQ NEQ GT LT GE LE ELSE RETURN NEW
+%token INT IF WHILE SPRINT IPRINT SCAN EQ NEQ GT LT GE LE ELSE RETURN NEW DO
 %token PLUS MINUS TIMES DIV MOD POW PLUSPLUS PLUS_EQ
 %token LB RB LS RS LP RP ASSIGN SEMI COMMA
 %token TYPE VOID
@@ -78,6 +78,11 @@ stmt :
                      { If ($3, $5, None) }
 | IF LP cond RP stmt ELSE stmt
                      { If ($3, $5, Some $7) }
+| DO stmt WHILE LP cond RP SEMI {
+  let first_stmt = $2 in
+  let cond = $5 in
+  Block([], [first_stmt; While (cond, first_stmt)])
+}
 | WHILE LP cond RP stmt
                      { While ($3, $5) }
 | SPRINT LP STR RP SEMI
