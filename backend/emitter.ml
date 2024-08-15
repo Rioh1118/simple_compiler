@@ -93,6 +93,11 @@ and trans_stmt ast nest tenv env =
       sprintf "\tmovq $%d, %%rdi\n" size
       ^ "\tcallq malloc\n" ^ "\tpushq %rax\n" ^ trans_var v nest env
       ^ "\tpopq (%rax)\n" (* 手続き呼出しのコード *)
+  | CallProc ("++", [VarExp v]) ->
+      let code = trans_var v nest env in
+      code ^ "\tmovq (%rax), %rbx\n"
+      ^ "\tincq %rbx\n"
+      ^ "\tmovq %rbx, (%rax)\n"
   | CallProc (s, el) -> (
       let entry = env s in
       match entry with
@@ -167,6 +172,12 @@ and trans_exp ast nest env =
   | VarExp v ->
       trans_var v nest env ^ "\tmovq (%rax), %rax\n"
       ^ "\tpushq %rax\n" (* +のコード *)
+  | CallFunc ("post_inc", [VarExp v]) ->
+      let code = trans_var v nest env in
+      code ^ "\tmovq (%rax), %rbx\n"
+      ^ "\tpushq %rbx\n"
+      ^ "\tincq %rbx\n"
+      ^ "\tmovq %rbx, (%rax)\n"
   | CallFunc ("+", [ left; right ]) ->
       trans_exp left nest env ^ trans_exp right nest env ^ "\tpopq %rax\n"
       ^ "\taddq %rax, (%rsp)\n" (* -のコード *)
