@@ -8,7 +8,7 @@
 %token <string> STR
 %token <string> ID
 %token INT IF WHILE SPRINT IPRINT SCAN EQ NEQ GT LT GE LE ELSE RETURN NEW
-%token PLUS MINUS TIMES DIV MOD POW PLUSPLUS
+%token PLUS MINUS TIMES DIV MOD POW PLUSPLUS PLUS_EQ
 %token LB RB LS RS LP RP ASSIGN SEMI COMMA
 %token TYPE VOID
 
@@ -91,6 +91,7 @@ stmt :
 | ID LP aargs_opt RP SEMI
                      { CallProc ($1, $3) }
 | ID PLUSPLUS SEMI   { CallProc ("++", [VarExp (Var $1)])}
+| ID PLUS_EQ expr SEMI { Assign (Var $1, CallFunc ("+", [VarExp (Var $1); $3]))}
 | RETURN expr SEMI
                      { CallProc ("return", [$2]) }
 | block              { $1 }
