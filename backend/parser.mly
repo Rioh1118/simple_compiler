@@ -8,7 +8,7 @@
 %token <string> STR
 %token <string> ID
 %token INT IF WHILE SPRINT IPRINT SCAN EQ NEQ GT LT GE LE ELSE RETURN NEW
-%token PLUS MINUS TIMES DIV MOD POW
+%token PLUS MINUS TIMES DIV MOD POW PLUSPLUS
 %token LB RB LS RS LP RP ASSIGN SEMI COMMA
 %token TYPE VOID
 
@@ -18,6 +18,7 @@
 %left PLUS MINUS   /* lowest precedence */
 %left TIMES DIV    /* medium precedence */
 %nonassoc UMINUS   /* highest precedence */
+%nonassoc PLUSPLUS 
 
 %start prog  /* the entry point */
 
