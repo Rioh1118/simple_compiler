@@ -89,6 +89,7 @@ stmt :
                      { CallProc ("new", [VarExp (Var $3)]) }
 | ID LP aargs_opt RP SEMI
                      { CallProc ($1, $3) }
+| ID PLUSPLUS SEMI   { CallProc ("++", [VarExp (Var $1)])}
 | RETURN expr SEMI
                      { CallProc ("return", [$2]) }
 | block              { $1 }
@@ -121,6 +122,7 @@ expr :
 | expr DIV expr      { CallFunc ("/", [$1; $3]) }
 | expr MOD expr      { CallFunc ("%", [$1; $3]) }
 | expr POW expr      { CallFunc ("^", [$1; $3]) }
+| ID PLUSPLUS        { CallFunc("post_inc", [VarExp (Var $1)])}
 | MINUS expr %prec UMINUS
                      { CallFunc("!", [$2]) }
 | LP expr RP         { $2 }
